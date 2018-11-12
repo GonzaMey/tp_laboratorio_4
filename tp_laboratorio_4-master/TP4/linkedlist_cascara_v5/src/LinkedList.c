@@ -101,22 +101,26 @@ static int addNode(LinkedList* this, int nodeIndex,void* pElement)
     Node* anteriorNode = NULL;
     Node* siguienteNode = NULL;
 
-    if(nodeIndex == 0)
+    if(this!= NULL)
     {
-        newNode->pNextNode = this->pFirstNode;
-        this->pFirstNode = newNode;
+
+        if(nodeIndex == 0)
+        {
+            newNode->pNextNode = this->pFirstNode;
+            this->pFirstNode = newNode;
+        }
+        else if(nodeIndex > 0 && nodeIndex <= ll_len(this))
+        {
+            anteriorNode = getNode(this,nodeIndex-1);
+            siguienteNode = anteriorNode->pNextNode;
+            anteriorNode->pNextNode = newNode;
+            newNode->pNextNode = siguienteNode;
     }
-    else if(nodeIndex > 0 && nodeIndex <= ll_len(this))
-    {
-        anteriorNode = getNode(this,nodeIndex-1);
-        siguienteNode = anteriorNode->pNextNode;
-        anteriorNode->pNextNode = newNode;
-        newNode->pNextNode = siguienteNode;
+        this->size +=1;
+        (newNode->pElement) = pElement;
+        returnAux = 0;
     }
 
-    this->size +=1;
-    newNode->pElement = pElement;
-    returnAux = 0;
 
     return returnAux;
 }
@@ -279,8 +283,13 @@ int ll_clear(LinkedList* this)
 int ll_deleteLinkedList(LinkedList* this)
 {
     int returnAux = -1;
-    int i;
-    Node* pNode;
+
+    if(this!=NULL)
+    {
+        ll_clear(this);
+        free(this);
+        returnAux = 0;
+    }
 
     return returnAux;
 }
@@ -296,6 +305,21 @@ int ll_deleteLinkedList(LinkedList* this)
 int ll_indexOf(LinkedList* this, void* pElement)
 {
     int returnAux = -1;
+    Node* auxNode = NULL;
+    int i;
+
+    if(this != NULL)
+    {
+        for(i=0; i<ll_len(this);i++)
+        {
+            auxNode = getNode(this,i);
+            if(auxNode->pElement == pElement)
+            {
+                returnAux=i;
+                break;
+            }
+        }
+    }
 
     return returnAux;
 }
@@ -311,6 +335,18 @@ int ll_indexOf(LinkedList* this, void* pElement)
 int ll_isEmpty(LinkedList* this)
 {
     int returnAux = -1;
+
+    if(this!=NULL)
+    {
+        if(ll_len(this)==0)
+        {
+            returnAux = 1;
+        }
+        if(ll_len(this)>0)
+        {
+            returnAux = 0;
+        }
+    }
 
     return returnAux;
 }
@@ -328,6 +364,13 @@ int ll_push(LinkedList* this, int index, void* pElement)
 {
     int returnAux = -1;
 
+    if(this != NULL && ll_len(this)>0 && index >= 0 && index<ll_len(this))
+    {
+        returnAux=addNode(this,index,pElement);
+
+        this->size+=1;
+    }
+
     return returnAux;
 }
 
@@ -344,6 +387,14 @@ void* ll_pop(LinkedList* this,int index)
 {
     void* returnAux = NULL;
 
+    if(this!= NULL && index>=0 && index < ll_len(this) && ll_len(this)>0)
+    {
+        returnAux = ll_get(this,index);
+        if(returnAux!= NULL)
+        {
+            ll_remove(this,index);
+        }
+    }
     return returnAux;
 }
 
@@ -359,6 +410,24 @@ void* ll_pop(LinkedList* this,int index)
 int ll_contains(LinkedList* this, void* pElement)
 {
     int returnAux = -1;
+    Node* pNode = NULL;
+    int i;
+
+    if(this!= NULL)
+    {
+        returnAux = 0;
+
+        for(i=0; i<ll_len(this);i++)
+        {
+            pNode = getNode(this,i);
+
+            if(pNode->pElement == pElement)
+            {
+                returnAux = 1;
+                break;
+            }
+        }
+    }
 
     return returnAux;
 }
@@ -375,6 +444,28 @@ int ll_contains(LinkedList* this, void* pElement)
 int ll_containsAll(LinkedList* this,LinkedList* this2)
 {
     int returnAux = -1;
+    Node* pNode1 = NULL;
+    Node* pNode2 = NULL;
+    int i,j;
+
+    if(this != NULL && this2!= NULL)
+    {
+        returnAux = 0;
+
+        for(i=0; i<ll_len(this2);i++)
+        {
+            for(j=0; j<ll_len(this);j++)
+            {
+                pNode1 = getNode(this,i);
+                pNode2 = getNode(this2,j);
+                if(pNode2 == pNode1)
+                {
+                    returnAux=1;
+                }
+            }
+
+        }
+    }
 
     return returnAux;
 }
