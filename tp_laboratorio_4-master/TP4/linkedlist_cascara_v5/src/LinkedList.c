@@ -454,13 +454,14 @@ int ll_containsAll(LinkedList* this,LinkedList* this2)
 
         for(i=0; i<ll_len(this2);i++)
         {
+            pNode1 = getNode(this,i);
             for(j=0; j<ll_len(this);j++)
-            {
-                pNode1 = getNode(this,i);
+            {      
                 pNode2 = getNode(this2,j);
                 if(pNode2 == pNode1)
                 {
                     returnAux=1;
+                    break;
                 }
             }
 
