@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../inc/LinkedList.h"
+#include "LinkedList.h"
 
 
 static Node* getNode(LinkedList* this, int nodeIndex);
@@ -364,11 +364,10 @@ int ll_push(LinkedList* this, int index, void* pElement)
 {
     int returnAux = -1;
 
-    if(this != NULL && ll_len(this)>0 && index >= 0 && index<ll_len(this))
+    if(this != NULL && index >= 0 && index<=ll_len(this))
     {
         returnAux=addNode(this,index,pElement);
 
-        this->size+=1;
     }
 
     return returnAux;
@@ -444,27 +443,23 @@ int ll_contains(LinkedList* this, void* pElement)
 int ll_containsAll(LinkedList* this,LinkedList* this2)
 {
     int returnAux = -1;
-    Node* pNode1 = NULL;
-    Node* pNode2 = NULL;
-    int i,j;
+    void* pAux=NULL;
+    int i;
+    int retorno;
 
     if(this != NULL && this2!= NULL)
     {
-        returnAux = 0;
+        returnAux = 1;
 
         for(i=0; i<ll_len(this2);i++)
         {
-            pNode1 = getNode(this,i);
-            for(j=0; j<ll_len(this);j++)
-            {      
-                pNode2 = getNode(this2,j);
-                if(pNode2 == pNode1)
-                {
-                    returnAux=1;
-                    break;
-                }
-            }
+          pAux = ll_get(this,i);
+          retorno = ll_contains(this2,pAux);
 
+          if(retorno==0)
+          {
+              returnAux = 0;
+          }
         }
     }
 
@@ -484,6 +479,18 @@ int ll_containsAll(LinkedList* this,LinkedList* this2)
 LinkedList* ll_subList(LinkedList* this,int from,int to)
 {
     LinkedList* cloneArray = NULL;
+    void* pAux = NULL;
+    int i;
+
+    if(this != NULL && from>=0 && from<ll_len(this) && to>=0 && to<=ll_len(this))
+    {
+        cloneArray=ll_newLinkedList();
+        for(i=from;i<to;i++)
+        {
+            pAux = ll_get(this,i);
+            ll_add(cloneArray,pAux);
+        }
+    }
 
     return cloneArray;
 }
@@ -499,6 +506,10 @@ LinkedList* ll_subList(LinkedList* this,int from,int to)
 LinkedList* ll_clone(LinkedList* this)
 {
     LinkedList* cloneArray = NULL;
+    if(this != NULL)
+    {
+        cloneArray = ll_subList(this,0,ll_len(this));
+    }
 
     return cloneArray;
 }
@@ -514,6 +525,44 @@ LinkedList* ll_clone(LinkedList* this)
 int ll_sort(LinkedList* this, int (*pFunc)(void* ,void*), int order)
 {
     int returnAux =-1;
+    void* pAux = NULL;   //Puntero a void
+    void* pNode1 = NULL; //Puntero a void
+    void* pNode2 = NULL; //Puntero a void
+    int i,j;
+
+    if(this != NULL && pFunc != NULL && (order == 1 || order == 0)) //Verifico que la lista y la funcion sean distinto de NULL y el orden este dentro del rango(0/1)
+    {
+        for(i=0;i<ll_len(this)-1; i++)
+        {
+            pNode1 = ll_get(this,i); //Elemento de la posicion i
+            for(j=i+1;j<ll_len(this);j++)
+            {
+                pNode2 = ll_get(this,j); //Elemento de la posicion j
+                if(order==0)    //Si el orden es 0
+                {
+                    if(pFunc(pNode1,pNode2)<0) //Si la fuincion retorna un entero menor a 0
+                    {
+                        pAux = pNode1;
+                        pNode1 = pNode2;
+                        pNode2 = pAux;
+                    }
+                }
+                else //Si el orden es 1
+                {
+                    if(pFunc(pNode1,pNode2)>0)  //Si la fuincion retorna un entero mayor a 0
+                    {
+                        pAux = pNode2;
+                        pNode2 = pNode1;
+                        pNode1 = pAux;
+                    }
+                }
+                //Agrego los elementos modificados a la lista (SWAP)
+                ll_set(this,i,pNode1);
+                ll_set(this,j,pNode2);
+            }
+        }
+        returnAux = 0; //Cambio el valor de retorno
+    }
 
     return returnAux;
 
